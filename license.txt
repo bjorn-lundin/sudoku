@@ -1,0 +1,25 @@
+
+
+SUNSET LICENSE
+Version 1.0, June 2017
+
+
+1. You may copy, modify, use, sell, or distribute this work, verbatim or
+modified, for any purpose.
+
+2. If you sell or distribute this work, whether verbatim or modified, you must
+include a copy of this license, and you must make the source code available for
+no extra charge.
+
+3. A modified version of this work must be clearly labeled as such.
+
+4. Derivative works must also be licensed under this license or a license of
+equivalent terms. As an exception, linking this work with another, whether
+statically or dynamically, does not impose any license requirements on the
+other work.
+
+5. If a minimum of 15 years have passed since the date of first publishing for
+a part of this work, then that part is placed into the public domain and you
+may do whatever you want with it, regardless of all other clauses.
+
+
