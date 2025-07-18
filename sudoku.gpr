@@ -1,0 +1,127 @@
+
+
+with
+
+    "fltkada";
+
+
+project sudoku is
+
+
+    for Languages use ("Ada", "C");
+
+
+    for Source_Dirs use ("hereiam", "src");
+    for Object_Dir use "obj";
+    for Exec_Dir use "bin";
+    for Main use ("main.adb");
+
+
+    type Build_Kind is ("release", "debug");
+
+    Ver : Build_Kind := external ("build", "debug");
+
+
+    package Builder is
+        for Default_Switches ("Ada") use ("-j4", "-m");
+
+        case Ver is
+
+        when "release" =>
+            null;
+
+        when "debug" =>
+            for Default_Switches ("Ada") use Builder'Default_Switches ("Ada") & "-g";
+
+        end case;
+
+        for Executable ("main.adb") use "sudoku";
+    end Builder;
+
+
+    Ada_Common :=
+       ("-gnaty"
+    --    & "4"     --  indentation
+    --    & "a"     --  attribute casing
+    --    & "A"     --  array attribute indices
+    --    & "b"     --  blanks at end of lines
+    --    & "c"     --  two space comments
+        & "e"     --  end/exit labels
+        & "f"     --  no form feeds or vertical tabs
+        & "h"     --  no horizontal tabs
+    --    & "i"     --  if/then layout
+        & "k"     --  keyword casing
+    --    & "l"     --  reference manual layout
+    --    & "M100"  --  max line length
+    --    & "n"     --  package Standard casing
+    --    & "p"     --  pragma casing
+   --     & "r"     --  identifier casing
+   --     & "t"    --  token separation
+        ,
+        "-gnatw"
+        & "a"     --  various warning modes
+        & "F"     --  don't check for unreferenced formal parameters
+        & "J"     --  don't check for obsolescent feature use
+        & "U");   --  don't check for unused entities
+
+    C_Common :=
+       ("-Wall",
+        "-Werror",
+        "-Wextra",
+        "-Wpedantic");
+
+    package Compiler is
+        case Ver is
+
+        when "release" =>
+            for Default_Switches ("Ada") use Ada_Common & "-O3" & "-gnatn";
+            for Default_Switches ("C")   use C_Common   & "-O3";
+
+        when "debug" =>
+            for Default_Switches ("Ada") use Ada_Common & "-O0" & "-gnata" & "-gnato" & "-g";
+            for Default_Switches ("C")   use C_Common   & "-O0";
+
+        end case;
+    end Compiler;
+
+
+    package Binder is
+        for Default_Switches ("Ada") use ("-shared");
+        case Ver is
+        when "release" =>
+            null;
+        when "debug" =>
+            for Default_Switches ("Ada") use Binder'Default_Switches ("Ada") & "-Es";
+        end case;
+    end Binder;
+
+
+    package Linker is
+        case Ver is
+
+        when "release" =>
+            null;
+
+        when "debug" =>
+            for Default_Switches ("Ada") use ("-g");
+
+        end case;
+
+        for Default_Switches ("Ada") use
+            Linker'Default_Switches ("Ada") & ("-L/usr/local/lib",
+                                               "-lfltk", 
+                                               "-lfltk_images",
+                                               "-L/usr/lib", 
+                                               "-lfltkada"); 
+    end Linker;
+
+
+    package Install is
+        for Artifacts ("share") use ("share/*");
+        for Mode use "usage";
+    end Install;
+
+
+end sudoku;
+
+
