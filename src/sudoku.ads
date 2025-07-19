@@ -4,6 +4,7 @@ with  FLTK.Widgets.Menus.Menu_Bars;
 with  FLTK.Widgets.Menus.Menu_Buttons;
 with  FLTK.Widgets.Inputs.Text;
 with  FLTK.Widgets.Boxes;
+with  FLTK.Widgets.Buttons.Enter;
 
 package sudoku is
 
@@ -26,6 +27,7 @@ package sudoku is
         Grid_1 : Grid_Array;
         Box_2  : FLTK.Widgets.Boxes.Box;       
         Grid_2 : Grid_Array;
+        btn_Analyze :  FLTK.Widgets.Buttons.Enter.Enter_Button;
     end record;
 
     function Create return Sudoku_Window;

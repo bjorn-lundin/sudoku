@@ -58,6 +58,8 @@ project sudoku is
    --     & "r"     --  identifier casing
    --     & "t"    --  token separation
         ,
+        "-gnat2022"
+        ,
         "-gnatw"
         & "a"     --  various warning modes
         & "F"     --  don't check for unreferenced formal parameters

@@ -46,6 +46,59 @@ package body sudoku is
 
 
 
+    procedure Analyze_CB(Item : in out FLTK.Widgets.Widget'Class) is
+        use type FLTK.Widgets.Buttons.State;
+--        type Find_Window_Access is access all Find_Window;
+--        Dialog : constant access Find_Window := Find_Window_Access (Item.Parent);
+    begin
+      text_io.put_Line("Analyze_CB start");
+
+      if item in FLTK.Widgets.Buttons.Enter.Enter_Button then
+         declare
+            btn :  FLTK.Widgets.Buttons.Enter.Enter_Button renames FLTK.Widgets.Buttons.Enter.Enter_Button(item);
+         begin 
+           text_io.put_Line("Analyze_CB Item is FLTK.Widgets.Buttons.Enter.Enter_Button ");
+           text_io.put_Line("Analyze_CB Item state " & btn.Get_State'image );
+           text_io.put_Line("Analyze_CB Item is_on " & btn.is_on'image );
+           text_io.put_Line("Analyze_CB Item Get_Down_Box " & btn.Get_Down_Box'image );
+           text_io.put_Line("Analyze_CB Item Get_Shortcut " & btn.Get_Shortcut'image );
+           text_io.put_Line("Analyze_CB Item Get_Label " & btn.Get_Label'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Color " & btn.Get_Label_Color'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Font " & btn.Get_Label_Font'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Size " & btn.Get_Label_Size'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Kind " & btn.Get_Label_Kind'image );
+           text_io.put_Line("Analyze_CB Item Get_X " & btn.Get_X'image );
+           text_io.put_Line("Analyze_CB Item Get_Y " & btn.Get_Y'image );
+           text_io.put_Line("Analyze_CB Item Get_W " & btn.Get_W'image );
+           text_io.put_Line("Analyze_CB Item Get_H " & btn.Get_H'image );
+           text_io.put_Line("Analyze_CB Item Is_Active " & btn.Is_Active'image );
+           text_io.put_Line("Analyze_CB Item Get_Alignment " & btn.Get_Alignment'image );
+           text_io.put_Line("Analyze_CB Item Get_Background_Color " & btn.Get_Background_Color'image );
+           text_io.put_Line("Analyze_CB Item Get_Selection_Color " & btn.Get_Selection_Color'image );
+
+
+
+
+
+
+
+         end;
+      else
+         text_io.put_Line("Analyze_CB Item is NOT a button");
+      end if;
+
+
+      text_io.put_Line("Analyze_CB " & Item'image);
+
+--        if Dialog.Callback /= null then
+--            Dialog.Callback.all
+--               (Dialog.Find_What.Get_Value,
+--                Dialog.Match_Case.Get_State = BU.On,
+--                Forward);
+--        end if;
+      text_io.put_Line("Analyze_CB stop");
+    end Analyze_CB;
+
 
     --  Main program interface.
 
@@ -65,7 +118,8 @@ package body sudoku is
             Box_1  => FLTK.Widgets.Boxes.Forge.Create(Fltk.Border_Box, 0,0,300,300,""),
             Grid_1 => (others => (others => FLTK.Widgets.Inputs.Text.Forge.Create(10,20,50,50))),
             Box_2  => FLTK.Widgets.Boxes.Forge.Create(Fltk.Border_Box, 320,0,900,300,""),
-            Grid_2 => (others => (others => FLTK.Widgets.Inputs.Text.Forge.Create(10,20,50,50)))
+            Grid_2 => (others => (others => FLTK.Widgets.Inputs.Text.Forge.Create(10,20,50,50))),
+            btn_Analyze =>  FLTK.Widgets.Buttons.Enter.Forge.Create(50, 310, 150, 75, "Analyze")
            )
         do
             Self.Box_1.Set_Background_Color(Fltk.RGB_Color(0,255,0));
@@ -88,6 +142,9 @@ package body sudoku is
               end loop;
             end loop; 
 
+            Self.btn_Analyze.Set_Callback(Analyze_CB'access);
+            Self.btn_Analyze.Set_Tooltip("a useful tooltip");
+            Self.Add(Self.btn_Analyze); 
 
  --           Self.Set_Callback (Hide_CB'Access);
 --            Self.Set_Modal_State (W.Modal);
@@ -98,6 +155,16 @@ package body sudoku is
 
     w : Sudoku_Window := Create;
    -----------------------------------------------------------
+
+
+    
+--    function Handle
+--           (This  : in out Enter_Button;
+--           Event : in     Event_Kind)
+--        return Event_Outcome;
+
+
+
 
     function Get_Menu_Bar
            (Self : in out Sudoku_Window)
