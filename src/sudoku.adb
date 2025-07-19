@@ -107,6 +107,7 @@ package body sudoku is
         Width       : Integer := Min_Editor_Width;
         Height      : Integer := Min_Editor_Height;
         Menu_Height : constant Integer := 22;
+        use all type Fltk.Color;
     begin
        
 
@@ -128,6 +129,11 @@ package body sudoku is
             for r in Row_Range loop
               for c in Column_Range loop
                  Self.Grid_1(r,c).Resize(X => 30*c-10, Y => 30*r-10 , W => 25, H=> 25);
+                 Self.Grid_1(r,c).Set_Background_Color(200+Fltk.color(c) + Fltk.color(r));
+                 if c = 2 then
+                  Self.Grid_1(r,c).Set_Readonly(True);
+                   Self.Grid_1(r,c).Set_Background_Color(Fltk.Background_Color); --gray
+                 end if;
                  Self.Add (Self.Grid_1(r, c));
               end loop;
             end loop; 
@@ -138,10 +144,12 @@ package body sudoku is
             for r in Row_Range loop
               for c in Column_Range loop
                  Self.Grid_2(r,c).Resize(X => 100*c-80 +300, Y => 30*r-10 , W => 100, H=> 25);
+                 Self.Grid_2(r,c).Set_Value("r" & r'img & ",c" & c'img); 
                  Self.Add (Self.Grid_2(r, c));
               end loop;
             end loop; 
 
+            Self.btn_Analyze.Set_Box(Fltk.Plastic_Up_Box);
             Self.btn_Analyze.Set_Callback(Analyze_CB'access);
             Self.btn_Analyze.Set_Tooltip("a useful tooltip");
             Self.Add(Self.btn_Analyze); 
