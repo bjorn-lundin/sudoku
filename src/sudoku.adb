@@ -21,89 +21,25 @@ use
 
 package body sudoku is
 
-
     --  Forward declarations of helper functions.
 
+    First_Time : Boolean := True;
 
+    procedure Analyze_CB(Item : in out FLTK.Widgets.Widget'Class) ; --forward
 
 
     procedure Centre (Win : in out FLTK.Widgets.Groups.Windows.Window'Class);
-
-
-
-
     --  Global state of the text editor.
-
---    Editor   : Windows.Editor.Editor_Window   := Windows.Editor.Create (800, 500);
---    Buffer   : FLTK.Text_Buffers.Text_Buffer  := FLTK.Text_Buffers.Forge.Create;
     About    : Windows.About.About_Window     := Windows.About.Create;
-
     Changed  : Boolean                      := False;
---    Mod_List : Change_Vectors.Change_Vector := Change_Vectors.Empty_Vector;
     Filename : Unbounded_String             := To_Unbounded_String (0);
-
- 
-
-
-
-    procedure Analyze_CB(Item : in out FLTK.Widgets.Widget'Class) is
-        use type FLTK.Widgets.Buttons.State;
---        type Find_Window_Access is access all Find_Window;
---        Dialog : constant access Find_Window := Find_Window_Access (Item.Parent);
-    begin
-      text_io.put_Line("Analyze_CB start");
-
-      if item in FLTK.Widgets.Buttons.Enter.Enter_Button then
-         declare
-            btn :  FLTK.Widgets.Buttons.Enter.Enter_Button renames FLTK.Widgets.Buttons.Enter.Enter_Button(item);
-         begin 
-           text_io.put_Line("Analyze_CB Item is FLTK.Widgets.Buttons.Enter.Enter_Button ");
-           text_io.put_Line("Analyze_CB Item state " & btn.Get_State'image );
-           text_io.put_Line("Analyze_CB Item is_on " & btn.is_on'image );
-           text_io.put_Line("Analyze_CB Item Get_Down_Box " & btn.Get_Down_Box'image );
-           text_io.put_Line("Analyze_CB Item Get_Shortcut " & btn.Get_Shortcut'image );
-           text_io.put_Line("Analyze_CB Item Get_Label " & btn.Get_Label'image );
-           text_io.put_Line("Analyze_CB Item Get_Label_Color " & btn.Get_Label_Color'image );
-           text_io.put_Line("Analyze_CB Item Get_Label_Font " & btn.Get_Label_Font'image );
-           text_io.put_Line("Analyze_CB Item Get_Label_Size " & btn.Get_Label_Size'image );
-           text_io.put_Line("Analyze_CB Item Get_Label_Kind " & btn.Get_Label_Kind'image );
-           text_io.put_Line("Analyze_CB Item Get_X " & btn.Get_X'image );
-           text_io.put_Line("Analyze_CB Item Get_Y " & btn.Get_Y'image );
-           text_io.put_Line("Analyze_CB Item Get_W " & btn.Get_W'image );
-           text_io.put_Line("Analyze_CB Item Get_H " & btn.Get_H'image );
-           text_io.put_Line("Analyze_CB Item Is_Active " & btn.Is_Active'image );
-           text_io.put_Line("Analyze_CB Item Get_Alignment " & btn.Get_Alignment'image );
-           text_io.put_Line("Analyze_CB Item Get_Background_Color " & btn.Get_Background_Color'image );
-           text_io.put_Line("Analyze_CB Item Get_Selection_Color " & btn.Get_Selection_Color'image );
-
-         end;
-      else
-         text_io.put_Line("Analyze_CB Item is NOT a button");
-      end if;
-
-
-      text_io.put_Line("Analyze_CB " & Item'image);
-
---        if Dialog.Callback /= null then
---            Dialog.Callback.all
---               (Dialog.Find_What.Get_Value,
---                Dialog.Match_Case.Get_State = BU.On,
---                Forward);
---        end if;
-      text_io.put_Line("Analyze_CB stop");
-    end Analyze_CB;
-
-
-
-
+----------------------------------------------------------------------------------
 
     procedure Add_New_Grid_Item
            (self : in out Sudoku_Window;
             r : Row_Range;
             c : Column_Range;
-            Char : in Character)
-    is
-
+            Char : in Character) is
     begin
         case Char is
         when '0' =>
@@ -148,12 +84,6 @@ package body sudoku is
 
     end load_file;
 
- 
-
-
-
-    --  Main program interface.
-
 --------------------------------------------------------------
     function Create return Sudoku_Window  is
         Width       : Integer := Min_Editor_Width;
@@ -161,8 +91,6 @@ package body sudoku is
         Menu_Height : constant Integer := 22;
         use all type Fltk.Color;
     begin
-       
-
         return Self : Sudoku_Window :=
            (FLTK.Widgets.Groups.Windows.Forge.Create(1250,400,"Sudoku Helper")
         with
@@ -180,10 +108,10 @@ package body sudoku is
 
             for r in Row_Range loop
               for c in Column_Range loop
-                 Self.Grid_1(r,c).Resize(X => 30*c-10, Y => 30*r-10 , W => 25, H=> 25);
+                 Self.Grid_1(r,c).Resize(X => 30*c-10, Y => 30*r-10, W => 25, H=> 25);
                  Self.Grid_1(r,c).Set_Background_Color(200+Fltk.color(c) + Fltk.color(r));
                  if c = 2 then
-                  Self.Grid_1(r,c).Set_Readonly(True);
+                   Self.Grid_1(r,c).Set_Readonly(True);
                    Self.Grid_1(r,c).Set_Background_Color(Fltk.Background_Color); --gray
                  end if;
                  Self.Add (Self.Grid_1(r, c));
@@ -211,31 +139,119 @@ package body sudoku is
         end return;
     end Create;
 
+    procedure check_row(self : in out Sudoku_Window;
+                        n : Number_Range;
+                        r : Row_Range;
+                        c : Column_Range) is
+    begin
+      text_io.put_Line("check_row doing nothing");
+    end check_row;
+
+    -------------------------------------
+
+    procedure check_col(self : in out Sudoku_Window;
+                        n : Number_Range;
+                        r : Row_Range;
+                        c : Column_Range) is
+    begin
+      text_io.put_Line("check_col doing nothing");
+    end check_col;
+
+    -------------------------------------
+
+    procedure check_square(self : in out Sudoku_Window;
+                        n : Number_Range;
+                        r : Row_Range;
+                        c : Column_Range) is
+    begin
+      text_io.put_Line("check_square doing nothing");
+    end check_square;
+
+    -------------------------------------
+
+
+    ---------------------------------------------
+
+    --  Main program interface.
+
    -----------------------------------------------------------
 
     w : Sudoku_Window := Create;
    -----------------------------------------------------------
 
 
+
+    procedure Analyze_CB(Item : in out FLTK.Widgets.Widget'Class) is
+        use type FLTK.Widgets.Buttons.State;
+--        type Find_Window_Access is access all Find_Window;
+--        Dialog : constant access Find_Window := Find_Window_Access (Item.Parent);
+    begin
+      text_io.put_Line("Analyze_CB start");
+
+      if item in FLTK.Widgets.Buttons.Enter.Enter_Button then
+         declare
+            btn : FLTK.Widgets.Buttons.Enter.Enter_Button renames FLTK.Widgets.Buttons.Enter.Enter_Button(item);
+         begin 
+           text_io.put_Line("Analyze_CB Item is FLTK.Widgets.Buttons.Enter.Enter_Button ");
+           text_io.put_Line("Analyze_CB Item state " & btn.Get_State'image );
+           text_io.put_Line("Analyze_CB Item is_on " & btn.is_on'image );
+           text_io.put_Line("Analyze_CB Item Get_Down_Box " & btn.Get_Down_Box'image );
+           text_io.put_Line("Analyze_CB Item Get_Shortcut " & btn.Get_Shortcut'image );
+           text_io.put_Line("Analyze_CB Item Get_Label " & btn.Get_Label'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Color " & btn.Get_Label_Color'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Font " & btn.Get_Label_Font'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Size " & btn.Get_Label_Size'image );
+           text_io.put_Line("Analyze_CB Item Get_Label_Kind " & btn.Get_Label_Kind'image );
+           text_io.put_Line("Analyze_CB Item Get_X " & btn.Get_X'image );
+           text_io.put_Line("Analyze_CB Item Get_Y " & btn.Get_Y'image );
+           text_io.put_Line("Analyze_CB Item Get_W " & btn.Get_W'image );
+           text_io.put_Line("Analyze_CB Item Get_H " & btn.Get_H'image );
+           text_io.put_Line("Analyze_CB Item Is_Active " & btn.Is_Active'image );
+           text_io.put_Line("Analyze_CB Item Get_Alignment " & btn.Get_Alignment'image );
+           text_io.put_Line("Analyze_CB Item Get_Background_Color " & btn.Get_Background_Color'image );
+           text_io.put_Line("Analyze_CB Item Get_Selection_Color " & btn.Get_Selection_Color'image );
+
+           if first_time then  
+             for r in Row_Range loop
+               for c in Column_Range loop
+                 if w.Grid_1(r,c).Get_Value = "-" then
+                   w.Grid_1(r,c).Set_Background_Color(Fltk.RGB_Color(128,128,128));
+                   w.Grid_1(r,c).Set_Value("");
+                 else
+                   for n in number_range loop
+                     w.check_row(n,r,c);
+                     w.check_col(n,r,c);
+                     w.check_square(n,r,c);
+                   end loop;
+                 end if;
+               end loop;
+             end loop;
+             first_time := False;
+           end if; 
+
+         end;
+      else
+         text_io.put_Line("Analyze_CB Item is NOT a button");
+      end if;
+      text_io.put_Line("Analyze_CB " & Item'image);
+      text_io.put_Line("Analyze_CB stop");
+    end Analyze_CB;
+
+    ----------------------------------------------------------
     
 --    function Handle
 --           (This  : in out Enter_Button;
 --           Event : in     Event_Kind)
 --        return Event_Outcome;
 
-
-
-
-    function Get_Menu_Bar
-           (Self : in out Sudoku_Window)
+    function Get_Menu_Bar(Self : in out Sudoku_Window)
         return FLTK.Widgets.Menus.Menu_Reference is
     begin
         return Ref : FLTK.Widgets.Menus.Menu_Reference (Self.Bar'Unchecked_Access);
     end Get_Menu_Bar;
 
 
-    function Get_Rightclick_Menu
-           (Self : in out Sudoku_Window)
+    function Get_Rightclick_Menu(Self : in out Sudoku_Window)
         return FLTK.Widgets.Menus.Menu_Reference is
     begin
         return Ref : FLTK.Widgets.Menus.Menu_Reference (Self.Popup'Unchecked_Access);
@@ -283,8 +299,7 @@ null;
     --  Callbacks for the menu.
 
 
-    procedure Open_CB
-           (Item : in out FLTK.Widgets.Widget'Class) is
+    procedure Open_CB(Item : in out FLTK.Widgets.Widget'Class) is
     begin
         declare
             New_Filename : constant String :=
@@ -296,14 +311,12 @@ null;
         end;
     end Open_CB;
     -----------------------------------
-    procedure Quit_CB
-           (Item : in out FLTK.Widgets.Widget'Class) is
+    procedure Quit_CB(Item : in out FLTK.Widgets.Widget'Class) is
     begin
         Hide;
     end Quit_CB;
     -----------------------------------
-    procedure About_CB
-           (Item : in out FLTK.Widgets.Widget'Class) is
+    procedure About_CB(Item : in out FLTK.Widgets.Widget'Class) is
     begin
         Centre (About);
         About.Show;

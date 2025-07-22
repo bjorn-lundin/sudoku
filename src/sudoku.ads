@@ -18,6 +18,10 @@ package sudoku is
     type Column_Range is range 1..9;
     function "*"(Left : Integer; Right : Column_Range) return Integer is (Left * Integer(Right));
 
+    type Number_Range is range 1..9;
+    function "*"(Left : Integer; Right : Number_Range) return Integer is (Left * Integer(Right));
+
+
     type Grid_Array is array(Row_Range, Column_Range) of FLTK.Widgets.Inputs.Text.Text_Input;
 
     type Sudoku_Window is new FLTK.Widgets.Groups.Windows.Window with record
@@ -38,6 +42,22 @@ package sudoku is
             Char : in Character);
 
     procedure Load_file(self : in out Sudoku_Window);
+
+    procedure check_row(self : in out Sudoku_Window;
+                        n : Number_Range;
+                        r : Row_Range;
+                        c : Column_Range);
+
+    procedure check_col(self : in out Sudoku_Window;
+                        n : Number_Range;
+                        r : Row_Range;
+                        c : Column_Range);
+
+    procedure check_square(self : in out Sudoku_Window;
+                        n : Number_Range;
+                        r : Row_Range;
+                        c : Column_Range);
+
 
 
     procedure Show;
