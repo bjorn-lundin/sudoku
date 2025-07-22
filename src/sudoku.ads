@@ -31,6 +31,14 @@ package sudoku is
     end record;
 
     function Create return Sudoku_Window;
+    procedure Add_New_Grid_Item
+           (self : in out Sudoku_Window;
+            r : Row_Range;
+            c : Column_Range;
+            Char : in Character);
+
+    procedure Load_file(self : in out Sudoku_Window);
+
 
     procedure Show;
 

@@ -76,12 +76,6 @@ package body sudoku is
            text_io.put_Line("Analyze_CB Item Get_Background_Color " & btn.Get_Background_Color'image );
            text_io.put_Line("Analyze_CB Item Get_Selection_Color " & btn.Get_Selection_Color'image );
 
-
-
-
-
-
-
          end;
       else
          text_io.put_Line("Analyze_CB Item is NOT a button");
@@ -98,6 +92,64 @@ package body sudoku is
 --        end if;
       text_io.put_Line("Analyze_CB stop");
     end Analyze_CB;
+
+
+
+
+
+    procedure Add_New_Grid_Item
+           (self : in out Sudoku_Window;
+            r : Row_Range;
+            c : Column_Range;
+            Char : in Character)
+    is
+
+    begin
+        case Char is
+        when '0' =>
+            self.Grid_1(r,c).Set_Value ("-");
+
+        when '1' .. '9' =>
+            declare
+              dummy : string(1..1) := (1 => char);
+            begin
+              self.Grid_1(r,c).Set_Value (dummy);
+            end;
+        when others =>
+            raise Program_Error with "bad char '" & char & "'";
+
+        end case;
+    end Add_New_Grid_Item;
+
+-----------------------------------------------------------
+
+    procedure Load_file(self : in out Sudoku_Window) is
+      Data_File : Text_io.file_type;
+      len : Natural := 0;
+      buffer : string(1..100);
+      filename : string := "sdk.dat";
+      row : row_Range := 1;
+      i : natural ;
+    begin
+       text_io.Open (Data_File, text_io.In_File, Filename);
+       loop
+         text_io.Get_Line(Data_File, Buffer, Len);
+         for col in column_range loop
+           i := integer(col);
+           self.Add_New_Grid_Item (row,col,buffer(i));
+         end loop;
+         if row < 9 then
+           row := row +1;
+         end if;
+       end loop;
+    exception
+      when  text_io.End_Error => 
+         text_io.close(Data_File);
+
+    end load_file;
+
+ 
+
 
 
     --  Main program interface.
@@ -143,7 +195,7 @@ package body sudoku is
 
             for r in Row_Range loop
               for c in Column_Range loop
-                 Self.Grid_2(r,c).Resize(X => 100*c-80 +300, Y => 30*r-10 , W => 100, H=> 25);
+                 Self.Grid_2(r,c).Resize(X => 100*c-80 +300, Y => 30*r-10 , W => 90, H=> 25);
                  Self.Grid_2(r,c).Set_Value("r" & r'img & ",c" & c'img); 
                  Self.Add (Self.Grid_2(r, c));
               end loop;
@@ -214,6 +266,8 @@ null;
       text_io.put_line("Sudoku.Show, 1");
       w.Show;
       text_io.put_line("Sudoku.Show, 2");
+      w.load_file;
+      text_io.put_line("Sudoku.Show, 3");
     end Show;
 
 
