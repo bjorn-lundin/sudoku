@@ -8,6 +8,8 @@
 
 with
     text_io,
+    Ada.Strings, 
+    Ada.Strings.fixed, 
     Ada.Strings.Unbounded,
 --    Change_Vectors,
     FLTK.Widgets.Menus,
@@ -16,6 +18,8 @@ with
 
 use
 
+    Ada.Strings, 
+    Ada.Strings.fixed, 
     Ada.Strings.Unbounded;
 
 
@@ -50,6 +54,8 @@ package body sudoku is
               dummy : string(1..1) := (1 => char);
             begin
               self.Grid_1(r,c).Set_Value (dummy);
+              Self.Grid_1(r,c).Set_Readonly(True);
+              Self.Grid_2(r,c).Set_Background_color(Fltk.RGB_Color(255,0,0));
             end;
         when others =>
             raise Program_Error with "bad char '" & char & "'";
@@ -67,21 +73,31 @@ package body sudoku is
       row : row_Range := 1;
       i : natural ;
     begin
-       text_io.Open (Data_File, text_io.In_File, Filename);
-       loop
-         text_io.Get_Line(Data_File, Buffer, Len);
-         for col in column_range loop
-           i := integer(col);
-           self.Add_New_Grid_Item (row,col,buffer(i));
-         end loop;
-         if row < 9 then
-           row := row +1;
-         end if;
-       end loop;
-    exception
-      when  text_io.End_Error => 
+      begin
+        text_io.Open (Data_File, text_io.In_File, Filename);
+        loop
+          text_io.Get_Line(Data_File, Buffer, Len);
+          for col in column_range loop
+            i := integer(col);
+            self.Add_New_Grid_Item (row,col,buffer(i));
+          end loop;
+          if row < 9 then
+            row := row +1;
+          end if;
+        end loop;
+      exception
+       when text_io.End_Error => 
          text_io.close(Data_File);
-
+      end;
+            -- fix up look 
+      for r in Row_Range loop
+        for c in Column_Range loop
+          if Self.Grid_1(r,c).Get_Value = "-" then
+            Self.Grid_1(r,c).Set_Background_Color(Fltk.RGB_Color(128,128,128));
+            Self.Grid_1(r,c).Set_Value("");
+          end if;
+        end loop;
+      end loop; 
     end load_file;
 
 --------------------------------------------------------------
@@ -90,81 +106,168 @@ package body sudoku is
         Height      : Integer := Min_Editor_Height;
         Menu_Height : constant Integer := 22;
         use all type Fltk.Color;
+        offset_x : Natural := 0;
+        offset_y : Natural := 0;
     begin
         return Self : Sudoku_Window :=
-           (FLTK.Widgets.Groups.Windows.Forge.Create(1250,400,"Sudoku Helper")
+           (FLTK.Widgets.Groups.Windows.Forge.Create(1250,450,"Sudoku Helper")
         with
             Bar    =>  FLTK.Widgets.Menus.Menu_Bars.Forge.Create(0, 0, Width, Menu_Height, ""),
             Popup  =>  FLTK.Widgets.Menus.Menu_Buttons.Forge.Create(0, Menu_Height, Width, Height - Menu_Height, ""),
-            Box_1  => FLTK.Widgets.Boxes.Forge.Create(Fltk.Border_Box, 0,0,300,300,""),
+            Box_1  => FLTK.Widgets.Boxes.Forge.Create(Fltk.Border_Box, 0,0,310,350,""),
             Grid_1 => (others => (others => FLTK.Widgets.Inputs.Text.Forge.Create(10,20,50,50))),
-            Box_2  => FLTK.Widgets.Boxes.Forge.Create(Fltk.Border_Box, 320,0,900,300,""),
+            Box_2  => FLTK.Widgets.Boxes.Forge.Create(Fltk.Border_Box, 320,0,950,350,""),
             Grid_2 => (others => (others => FLTK.Widgets.Inputs.Text.Forge.Create(10,20,50,50))),
-            btn_Analyze =>  FLTK.Widgets.Buttons.Enter.Forge.Create(50, 310, 150, 75, "Analyze")
+            btn_Analyze =>  FLTK.Widgets.Buttons.Enter.Forge.Create(50, 370, 150, 75, "Analyze")
            )
         do
             Self.Box_1.Set_Background_Color(Fltk.RGB_Color(0,255,0));
             Self.Add(Self.Box_1);
-
-            for r in Row_Range loop
-              for c in Column_Range loop
-                 Self.Grid_1(r,c).Resize(X => 30*c-10, Y => 30*r-10, W => 25, H=> 25);
-                 Self.Grid_1(r,c).Set_Background_Color(200+Fltk.color(c) + Fltk.color(r));
-                 if c = 2 then
-                   Self.Grid_1(r,c).Set_Readonly(True);
-                   Self.Grid_1(r,c).Set_Background_Color(Fltk.Background_Color); --gray
-                 end if;
-                 Self.Add (Self.Grid_1(r, c));
-              end loop;
-            end loop; 
 
             Self.Box_2.Set_Background_Color(Fltk.RGB_Color(0,128,128));
             Self.Add(Self.Box_2);
 
             for r in Row_Range loop
               for c in Column_Range loop
-                 Self.Grid_2(r,c).Resize(X => 100*c-80 +300, Y => 30*r-10 , W => 90, H=> 25);
-                 Self.Grid_2(r,c).Set_Value("r" & r'img & ",c" & c'img); 
+                 if r > 6 then
+                   offset_y := 20;
+                 elsif r > 3 then
+                   offset_y := 10;
+                 else
+                   offset_y := 0;
+                 end if;
+                 if c > 6 then
+                   offset_x := 20;
+                 elsif c > 3 then
+                   offset_x := 10;
+                 else
+                   offset_x := 0;
+                 end if;
+--            text_io.put_line(r'img & c'img & offset_y'img & offset_x'img);
+                 Self.Grid_1(r,c).Resize(X => offset_x + 30*c-16, Y => offset_y + 30*r-10, W => 25, H=> 25);
+                 Self.Add (Self.Grid_1(r, c));
+
+                 Self.Grid_2(r,c).Resize(X => offset_x + 100*c-70 +300, Y => offset_y + 30*r-10 , W => 70, H=> 25);
                  Self.Add (Self.Grid_2(r, c));
               end loop;
             end loop; 
+
 
             Self.btn_Analyze.Set_Box(Fltk.Plastic_Up_Box);
             Self.btn_Analyze.Set_Callback(Analyze_CB'access);
             Self.btn_Analyze.Set_Tooltip("a useful tooltip");
             Self.Add(Self.btn_Analyze); 
 
+
+
+            -- fix up look 
+            --for r in Row_Range loop
+            --   for c in Column_Range loop
+            --     if Self.Grid_1(r,c).Get_Value = "-" then
+            --       Self.Grid_1(r,c).Set_Background_Color(Fltk.RGB_Color(128,128,128));
+            --       Self.Grid_1(r,c).Set_Value("");
+            --     end if;
+            --  end loop;
+            --end loop; 
+
+
+
  --           Self.Set_Callback (Hide_CB'Access);
 --            Self.Set_Modal_State (W.Modal);
         end return;
     end Create;
 
-    procedure check_row(self : in out Sudoku_Window;
+    function check_row(self : in out Sudoku_Window;
                         n : Number_Range;
                         r : Row_Range;
-                        c : Column_Range) is
+                        c : Column_Range) return Boolean is
+      ret : boolean := True;
     begin
-      text_io.put_Line("check_row doing nothing");
+      for cc in Column_Range loop
+          if r=1 then
+            text_io.put_line("'" & trim(self.Grid_1(r,cc).Get_Value,Both) & "' -> '" & trim(n'image,both) & "'");
+          end if; 
+        if trim(self.Grid_1(r,cc).Get_Value,Both) = trim(n'image,both) then
+          ret := False;
+          exit;
+        end if;
+      end loop;
+      text_io.put_line("check_row ret " & ret'img);
+      return ret ;
+
     end check_row;
 
     -------------------------------------
 
-    procedure check_col(self : in out Sudoku_Window;
+    function check_col(self : in out Sudoku_Window;
                         n : Number_Range;
                         r : Row_Range;
-                        c : Column_Range) is
+                        c : Column_Range) return Boolean is
+      ret : boolean := True;
     begin
-      text_io.put_Line("check_col doing nothing");
+      for rr in Row_Range loop
+          if c=1 then
+            text_io.put_line("'" & trim(self.Grid_1(rr,c).Get_Value,Both) & "' -> '" & trim(n'image,both) & "'");
+          end if; 
+        if trim(self.Grid_1(rr,c).Get_Value,Both) = trim(n'image,both) then
+          ret := False;
+          exit; 
+        end if;
+      end loop;
+      text_io.put_line("check_col ret " & ret'img);
+      return ret ;
     end check_col;
 
     -------------------------------------
 
-    procedure check_square(self : in out Sudoku_Window;
+    function check_square(self : in out Sudoku_Window;
                         n : Number_Range;
                         r : Row_Range;
-                        c : Column_Range) is
+                        c : Column_Range) return Boolean is
+
+--      is_ok : Boolean := True;
+      c1,c2 :Column_Range;
+      r1,r2 :row_Range;
     begin
-      text_io.put_Line("check_square doing nothing");
+ --     text_io.put_Line("check_square doing nothing");
+ --     return True; 
+      -- what square are we in?
+      --  1|2|3
+      --  4|5|6
+      --  7|8|9
+          ----- 
+
+      case r is
+        when 1..3 =>
+          case c is
+            when 1..3 => c1 := 1; c2:= 3; r1:=1; r2:=3; 
+            when 4..6 => c1 := 4; c2:= 6; r1:=1; r2:=3;
+            when 7..9 => c1 := 7; c2:= 9; r1:=1; r2:=3;
+          end case;
+        when 4..6 =>
+          case c is
+            when 1..3 => c1 := 1; c2:= 3; r1:=4; r2:=6; 
+            when 4..6 => c1 := 4; c2:= 6; r1:=4; r2:=6;
+            when 7..9 => c1 := 7; c2:= 9; r1:=4; r2:=6;
+          end case;
+        when 7..9 =>
+          case c is
+            when 1..3 => c1 := 1; c2:= 3; r1:=7; r2:=9; 
+            when 4..6 => c1 := 4; c2:= 6; r1:=7; r2:=9;
+            when 7..9 => c1 := 7; c2:= 9; r1:=7; r2:=9;
+          end case;
+      end case;
+     
+      for c0 in c1 .. c2 loop
+         for r0 in r1 .. r2 loop
+           if trim(self.grid_1(r0,c0).get_value,Both) = trim(n'image,both) then
+              return false;
+           end if;
+         end loop;
+      end loop;
+
+      return True;
+
     end check_square;
 
     -------------------------------------
@@ -211,23 +314,63 @@ package body sudoku is
            text_io.put_Line("Analyze_CB Item Get_Background_Color " & btn.Get_Background_Color'image );
            text_io.put_Line("Analyze_CB Item Get_Selection_Color " & btn.Get_Selection_Color'image );
 
-           if first_time then  
-             for r in Row_Range loop
+
+           --clear grid2
+           for r in Row_Range loop
+             for c in Column_Range loop
+               w.Grid_2(r,c).Set_Value("");
+             end loop;
+           end loop;
+
+
+           for r in Row_Range loop
                for c in Column_Range loop
-                 if w.Grid_1(r,c).Get_Value = "-" then
-                   w.Grid_1(r,c).Set_Background_Color(Fltk.RGB_Color(128,128,128));
-                   w.Grid_1(r,c).Set_Value("");
-                 else
                    for n in number_range loop
-                     w.check_row(n,r,c);
-                     w.check_col(n,r,c);
-                     w.check_square(n,r,c);
+                     declare
+                       row_ok : boolean := False;
+                       col_ok : boolean := False;
+                       square_ok : boolean := False;
+                     begin
+                       row_ok := w.check_row(n,r,c);
+                       col_ok := w.check_col(n,r,c);
+                       square_ok := w.check_square(n,r,c);
+
+                       if row_ok 
+                         and col_ok
+                         and square_ok 
+                       then
+                          declare
+                            v : constant string := Trim(w.Grid_2(r,c).Get_Value,both);
+                            nv : constant string := trim(n'image,both);
+                            already_present : boolean := false;
+                          begin 
+                            for i in v'range loop
+                              if v(i..i) = nv then
+                                already_present := true;
+                                exit;
+                              end if;
+                            end loop;
+
+                            if not Already_present 
+                              and then not w.Grid_1(r,c).is_readonly
+                            then
+                              w.Grid_2(r,c).Set_Value(v & nv);
+                              if v'length + nv'length = 1 then
+                                w.Grid_2(r,c).Set_Background_Color(Fltk.RGB_Color(0,255,0)); --green
+                              elsif v'length + nv'length = 2 then
+                                w.Grid_2(r,c).Set_Background_Color(Fltk.RGB_Color(0,0,255)); --blue
+                              else
+                                w.Grid_2(r,c).Set_Background_Color(Fltk.RGB_Color(255,0,0)); --red
+                              end if;
+                            end if;
+                          end;
+                       end if;
+                     end;
                    end loop;
-                 end if;
                end loop;
              end loop;
-             first_time := False;
-           end if; 
+      --       first_time := False;
+      --     end if; 
 
          end;
       else

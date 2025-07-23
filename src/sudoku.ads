@@ -43,20 +43,20 @@ package sudoku is
 
     procedure Load_file(self : in out Sudoku_Window);
 
-    procedure check_row(self : in out Sudoku_Window;
+    function check_row(self : in out Sudoku_Window;
                         n : Number_Range;
                         r : Row_Range;
-                        c : Column_Range);
+                        c : Column_Range) return Boolean;
 
-    procedure check_col(self : in out Sudoku_Window;
+    function check_col(self : in out Sudoku_Window;
                         n : Number_Range;
                         r : Row_Range;
-                        c : Column_Range);
+                        c : Column_Range) return Boolean;
 
-    procedure check_square(self : in out Sudoku_Window;
+    function check_square(self : in out Sudoku_Window;
                         n : Number_Range;
                         r : Row_Range;
-                        c : Column_Range);
+                        c : Column_Range) return Boolean;
 
 
 
